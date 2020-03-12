@@ -1,0 +1,338 @@
+// Assignment 1 Pathfinding Project.cpp: A program using the TL-Engine
+
+#include <TL-Engine.h>	// TL-Engine include file and namespace
+#include<iostream>
+#include"Coords struct.h"
+#include<fstream>
+#include<memory>
+#include<string>
+#include<deque>
+#include<algorithm>
+using namespace tle;
+using namespace std;
+
+void nextcoords(coords* t, deque<unique_ptr<coords>>& myList, tile map[10][10])
+{
+	unique_ptr<coords>next(new coords);
+	cout << "n: " << t->x << " " << t->y << endl;
+	next->x = t->x;
+	next->y = t->y + 1;
+	next->score = t->score + 1;
+
+	if (next->x >= 0 && next->x < 10 && next->y >= 0 && next->y < 10)
+	{
+		if (map[next->x][next->y].state != 0)
+		{
+			myList.push_front(move(next));
+		}
+	}
+
+	next.reset(new coords);
+	next->x = t->x + 1;
+	next->y = t->y;
+	next->score = t->score + 1;
+
+	if (next->x >= 0 && next->x < 10 && next->y >= 0 && next->y < 10)
+	{
+		if (map[next->x][next->y].state != 0)
+		{
+			myList.push_front(move(next));
+		}
+	}
+
+	next.reset(new coords);
+	next->x = t->x;
+	next->y = t->y - 1;
+	next->score = t->score + 1;
+
+	if (next->x >= 0 && next->x < 10 && next->y >= 0 && next->y < 10)
+	{
+		if (map[next->x][next->y].state != 0)
+		{
+			myList.push_front(move(next));
+		}
+	}
+
+	next.reset(new coords);
+	next->x = t->x - 1;
+	next->y = t->y;
+	next->score = t->score + 1;
+
+	if (next->x >= 0 && next->x < 10 && next->y >= 0 && next->y < 10)
+	{
+		if (map[next->x][next->y].state != 0)
+		{
+			myList.push_front(move(next));
+		}
+	}
+}
+
+bool CompareCoords(unique_ptr<coords>& lhs, unique_ptr<coords>& rhs)
+{
+	return lhs->score < rhs->score;
+}
+
+
+void Display(deque<unique_ptr<coords>>& myList)
+{
+	if (myList.empty())
+	{
+		cout << "This List is empty" << endl;
+	}
+	else
+	{
+		deque <unique_ptr <coords> >::iterator p;  //creates an iterator to go through the list
+		cout << "Display list using created iterator and dereferencing using() around *p " << endl;
+		for (auto p = myList.begin(); p != myList.end(); p++)   //displays the open list using the iterator  
+		{
+			cout << (*p)->x << "  " << (*p)->y << endl;
+		}
+	}
+}
+
+bool find(coords* t, deque<unique_ptr<coords>>& openList)
+{
+	for (auto p = openList.begin(); p != openList.end(); p++)   //displays the open list using the iterator  
+	{
+		if (t->x == (*p)->x && t->y == (*p)->y)
+		{
+			cout << "The coords searched for are in the open list" << endl;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+}
+
+
+void main()
+{
+	// Create a 3D engine (using TLX engine here) and open a window for it
+	I3DEngine* myEngine = New3DEngine( kTLX );
+	myEngine->StartWindowed();
+
+	// Add default folder for meshes and other media
+	myEngine->AddMediaFolder( "\Models" );
+	IMesh* mapSquareMesh;
+	IModel* mapSquare;
+	mapSquareMesh = myEngine->LoadMesh("state.x");
+
+
+	//Opening the .txt file 
+	string line;
+	fstream myfile;
+	/*myfile.open("mMap.txt");
+	if (myfile.is_open())
+	{
+		while (getline(myfile, line))
+		{
+			cout << line << '\n';
+		}
+		myfile.close();
+	}
+
+	else cout << "Unable to open file";*/
+
+	//cout << "display from map array not txt file" << endl;
+	tile map[10][10];
+		myfile.open("mMap.txt");
+		if (myfile.is_open())
+		{
+			for (int row = 9; row>=0; row--)
+			{
+				getline(myfile, line);
+				for (int col = 0; col<=9; col++)
+				{
+					map[row][col].state = line[col] - '0';
+					mapSquare = mapSquareMesh->CreateModel(col, row, 0);
+					if (map[row][col].state == 0)
+					{
+						mapSquare->SetSkin("black.PNG");
+					}
+					if (map[row][col].state == 1)
+					{
+						mapSquare->SetSkin("white.PNG");
+					}
+					if (map[row][col].state == 3)
+					{
+						mapSquare->SetSkin("blue.PNG");
+					}
+					if (map[row][col].state == 7)
+					{
+						mapSquare->SetSkin("brown.PNG");
+					}
+					if (map[row][col].state == 9)
+					{
+						mapSquare->SetSkin("red.PNG");
+					}
+				}
+			}
+		}
+		myfile.close();
+
+		/*unique_ptr <coords> start(new coords);
+		unique_ptr <coords> end(new coords);
+		myfile.open("mCoords.txt");
+		if (myfile.is_open())
+		{
+			for (int i = 1; i>=0; i--)
+			{
+				getline(myfile, line);
+				for (int col = 0; col < 2; col++)
+				{
+					start->x= line[col];
+					start->y = line[col];
+				}
+			}
+		}
+		
+		myfile.close();
+
+
+		if (map[start->x][start->y].state == 1)
+		{
+			mapSquare = mapSquareMesh->CreateModel(start->y, start->x, 1);
+			mapSquare->SetSkin("red.PNG");
+		}*/
+
+		
+	cout <<"first element of the arrary"<< map[9][0].state;
+
+	//start of a* algorithm
+	//creating open list and closed list
+	deque <unique_ptr < coords > > openList;
+	deque <unique_ptr < coords > > closedList;
+
+	//creating tmp and current nodes
+	unique_ptr <coords> n(new coords);
+	unique_ptr <coords> currentNode(new coords);
+	unique_ptr <coords> newcost(new coords);
+
+	//creating pointers for start and end nodes
+	unique_ptr <coords> startNode(new coords);
+	unique_ptr <coords> endNode(new coords);
+
+	coords * path;
+
+	//assign the start node to the front of the open list
+	startNode->x = 3;
+	startNode->y = 4;
+	startNode->score = 0;
+	startNode->parent = 0;
+	openList.push_front(move(startNode));
+
+	//assign the end location
+	endNode->x = 5;
+	endNode->y = 6;
+
+	cout << "open list x: " << openList.front()->x << " open list y: " << openList.front()->y << endl;
+	cout << "end x: " << endNode->x << " end y: " << endNode->y << endl;
+
+
+
+	while (openList.front()->x != endNode->x || openList.front()->y != endNode->y)  //while front of the open list isn't the goal
+	{
+		currentNode = move(openList.front());      //pop first item from open list and make current 
+		openList.pop_front();
+		cout << "Parent:  " << currentNode->parent << endl;
+		nextcoords(currentNode.get(), openList, map);
+		cout << "current X: " << currentNode->x << " " << "current Y: " << currentNode->y << "  score:  " << currentNode->score << endl;
+
+		n = move(openList.front());  //make n the front of the open list
+		openList.pop_front();
+		cout << "n X: " << n->x << " " << "n Y: " << n->y << " n score:  " << n->score << endl;
+
+
+		newcost->score = currentNode->score + n->score;
+		cout << "newscore: " << newcost->score << endl;
+
+		if (find(n.get(), openList) == true || find(n.get(), closedList) == true)
+		{
+			cout << "item is on the open or closed list ";
+			if (newcost->score >= n->score)
+			{
+				//need to look at how to skip out of this
+				//back to the start
+				cout << "with new score greater than or equal to n score" << endl;
+			}
+			else
+			{
+				cout << "with new score less than previous" << endl;
+				// n from list = existing n
+				// parent *n = current
+				// calculate hueristic value
+				// n->score = newscore->score + heuristic
+			}
+		}
+		else
+		{
+			cout << "item not on list" << endl;
+			if (find(n.get(), closedList) == true)
+			{
+				cout << "Popping n from closed and pushing to open" << endl;
+				//pop from closed
+				//push on open
+			}
+			else
+			{
+				cout << "Pushing to open list" << endl;
+				n->parent = currentNode.get();
+				cout << "path " << n->parent<< endl;
+				openList.push_back(move(n));
+			}
+		}
+		cout << "not reached goal" << endl;
+		cout << currentNode->x <<"   "<< currentNode->y << endl;
+		
+		closedList.push_back(move(currentNode));
+
+
+		sort(openList.begin(), openList.end(), CompareCoords);  // sort by lowest score first
+		Display(openList);
+		Display(closedList);
+
+		system("pause");
+	}
+
+	
+
+
+
+	Display(openList);
+	//Display(closedList);
+	//cout << currentNode->x << "  " << currentNode->y << endl;
+
+	//currentNode = Transfer(move(currentNode));  //output from pointer/transfer
+	cout << "You have reached the goal" << endl;
+	currentNode = move(openList.front());
+	cout <<"current x: "<<currentNode->x<< "current y: "<<currentNode->y  <<"score: "<<currentNode->score<< endl;
+	system("pause");
+
+	while (path != 0)
+	{
+		cout << "path:  " << path->parent << endl;
+		path = path->parent;
+	}
+
+
+	/**** Set up your scene here ****/
+	ICamera* myCamera;								//Create Camera
+	myCamera = myEngine->CreateCamera();
+	
+
+	// The main game loop, repeat until engine is stopped
+	while (myEngine->IsRunning())
+	{
+		// Draw the scene
+		myEngine->DrawScene();
+		
+	
+		/**** Update your scene each frame here ****/
+
+	}
+
+	// Delete the 3D engine now we are finished with it
+	myEngine->Delete();
+}

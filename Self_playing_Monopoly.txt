@@ -1,0 +1,288 @@
+//#include "stdafx.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+
+
+const char POUND = 156;
+
+class boardSpace
+{
+public:
+	int code, cost, rent, group;
+	string street, street2, street3;
+};
+
+class player // Players class.
+{
+public:
+	string name;
+	int localPos;
+	int money;
+	
+	player()
+	{
+		money = 1500;
+		localPos = 0;
+		string owned;
+	}
+};
+
+int readFile(boardSpace marray[], int i = 0) // Reading in and storing the Monopoly Board.
+{
+
+	ifstream inFile;
+	inFile.open("Monopoly.txt");
+	while (!inFile.eof() && i< 26)
+	{
+		inFile >> marray[i].code;
+		inFile >> marray[i].street;
+
+		if (marray[i].code == 1)
+		{
+			inFile >> marray[i].street2;
+			inFile >> marray[i].cost;
+			inFile >> marray[i].rent;
+			inFile >> marray[i].group;
+		}
+
+		if (marray[i].code == 3)
+		{
+			inFile >> marray[i].street2;
+		}
+
+		if (marray[i].code == 7)
+		{
+			inFile >> marray[i].street2;
+			inFile >> marray[i].street3;
+
+		}
+
+		if (marray[i].code == 8)
+		{
+			inFile >> marray[i].street;
+		}
+
+		i++;
+
+		if (inFile.eof())
+		{
+			break;
+		}
+	}
+	inFile.close();
+	return i;
+}
+
+
+int Random()// Random Number Generator for the dice roll
+{
+	return static_cast<int>(static_cast<double> (rand()) / (RAND_MAX + 1) * 6.0f + 1);
+}
+
+
+int seedFile()// Seed file for the RNG.
+{
+	ifstream seed;
+	seed.open("seed.txt");//Seed set at 5
+	int i = 0;
+	string line;
+	if (seed.eof())
+	{
+		while (!seed.eof())
+		{
+			seed >> line;
+			i = stoi(line);
+		}
+	}
+	return 0;
+}
+
+
+
+void Display(boardSpace marray[])//For checking the Monopoly.txt file is reading in correctly.
+{
+	for (int i = 0; i < 26; i++)
+	{
+		cout << marray[i].code << "    " << marray[i].street << " " << marray[i].street2 << "  " << POUND << "" << marray[i].cost << "  " << POUND << "" << marray[i].rent << " " << marray[i].group << endl;
+	}
+}
+
+////////////////////////////////
+////////////--GAME--////////////
+////////////////////////////////
+
+void gameLoop(boardSpace marray[26], player piece[2])
+{
+
+	int diceRoll = Random();
+
+	int round = 0, roundTurn;// Keeping track of what round we are in, up to 20 Rounds.
+
+	int local;// Tracking the Players local position.
+
+	piece[0].name = "Dog";//Players, stored in a array for ease of access (in my opnion)
+	piece[1].name = "Car";
+
+	
+	for (roundTurn = 0; roundTurn < 2; roundTurn++)
+		{
+			cout << "your Turn:  " << piece[roundTurn].name << endl;
+			local = piece[roundTurn].localPos;
+			cout << "Dice Rolled a:  " << diceRoll << endl;
+
+			piece[roundTurn].localPos = piece[roundTurn].localPos + diceRoll;
+			if (piece[roundTurn].localPos >= 26)
+			{
+				piece[roundTurn].localPos = piece[roundTurn].localPos - 26;
+				cout << piece[roundTurn].name << "You passed GO! Please collect " <<POUND<<"200 " << endl<<endl;
+				piece[roundTurn].money += 200;
+			}
+			cout << piece[roundTurn].name << " landed on " << marray[piece[roundTurn].localPos].street << " " << marray[piece[roundTurn].localPos].street2 << endl;
+			
+			if (marray[piece[roundTurn].localPos].code == 1)// If a player lands on a property
+			{
+				piece[roundTurn].money -= marray[piece[roundTurn].localPos].rent;
+				
+			}
+
+			if (marray[piece[roundTurn].localPos].code == 3) // Player Lands on a Retail Park
+			{
+				marray[piece[roundTurn].localPos].rent = 10; // Set Retail Park Rent
+				marray[piece[roundTurn].localPos].cost = 200; // Set Retail Park Cost
+				cout << "Retail Park costs: " << POUND << "200" << endl;
+				piece[roundTurn].money -= marray[piece[roundTurn].localPos].cost;
+			}
+			
+			if (marray[piece[roundTurn].localPos].code == 4)  // Player Lands on a Bonus Space
+			{
+				// Random Amount of Money gained dependant on the dice roll
+				int bonus = Random();
+				cout << "Bonus Awarded: " << endl;
+				
+				if (bonus == 1)
+				{
+					piece[roundTurn].money += 50;
+					cout << POUND << "50" << endl;
+				}
+				if (bonus == 2)
+				{
+					piece[roundTurn].money += 100;
+					cout << POUND << "50" << endl;
+				}
+				if (bonus == 3)
+				{
+					piece[roundTurn].money += 150;
+					cout << POUND << "50" << endl;
+				}
+				if (bonus == 4)
+				{
+					piece[roundTurn].money += 200;
+					cout << POUND << "50" << endl;
+				}
+				if (bonus == 5)
+				{
+					piece[roundTurn].money += 250;
+					cout << POUND << "50" << endl;
+				}
+				if (bonus == 6)
+				{
+					piece[roundTurn].money += 30;
+					cout << POUND << "50" << endl;
+				}
+			}
+
+			if (marray[piece[roundTurn].localPos].code == 5) // Player Lands on a Penalty Space
+			{
+				// Random Amount of Money lost
+				int bonus = Random();
+				cout << "Penalty Incurred: " << endl;
+
+				if (bonus == 1)
+				{
+					piece[roundTurn].money -= 50;
+					cout << POUND << "50" << endl;
+				}
+				if (bonus == 2)
+				{
+					piece[roundTurn].money -= 100;
+					cout << POUND << "50" << endl;
+				}
+				if (bonus == 3)
+				{
+					piece[roundTurn].money -= 150;
+					cout << POUND << "50" << endl;
+				}
+				if (bonus == 4)
+				{
+					piece[roundTurn].money -= 200;
+					cout << POUND << "50" << endl;
+				}
+				if (bonus == 5)
+				{
+					piece[roundTurn].money -= 250;
+					cout << POUND << "50" << endl;
+				}
+				if (bonus == 6)
+				{
+					piece[roundTurn].money -= 30;
+					cout << POUND << "50" << endl;
+				}
+			}
+			
+			if (marray[piece[roundTurn].localPos].code == 7)//  If a player lands on Go to Jail
+			{
+				cout << "Player Money: " << POUND << piece[roundTurn].money << endl;
+				cout << "Please pay " << POUND << "50 to release from Jail " << endl;
+				piece[roundTurn].money -= 50;				
+				piece[roundTurn].localPos = 6;
+			}
+
+			cout << POUND << piece[roundTurn].money << endl << endl;		
+		}
+
+}
+
+
+int main()
+{
+	//srand(seedFile());
+	srand(5);
+	int count = 0;
+	int import = 0;
+	boardSpace marray[26];
+	player piece[2];
+	import = readFile(marray, count);
+	Display(marray);
+
+	cout << "           Welcome to Monopoly" << endl << endl << endl;
+
+	cout << "                  ___            " << endl;
+	cout << "                 |#__|            " << endl;
+	cout << "                 .---.            " << endl;
+	cout << "                =;===;=           " << endl;
+	cout << "                / - - \           " << endl;
+	cout << "               ( _'.'_ )          " << endl;
+	cout << "             .-`-'^'-`-.          " << endl;
+	cout << "             |   `>o<'   |        " << endl;
+	cout << "             /     :     \        " << endl;
+	cout << "            /  /\  :  /\  \       " << endl;
+	cout << "          .-'-/ / .-. \ \-'-.     " << endl;
+	cout << "           |_/ /-'   '-\ \_|      " << endl;
+	cout << "              /|   |   |\         " << endl;
+	cout << "             (_|  /^\  |_)        " << endl;
+	cout << "               |  | |  |          " << endl;
+	cout << "               |  | |  |          " << endl;
+	cout << "             '==='= ='==='        " << endl;
+
+	
+
+	for (int i = 0; i < 20; i++)
+	{
+		gameLoop(marray, piece);
+	}
+
+
+	system("Pause");
+}

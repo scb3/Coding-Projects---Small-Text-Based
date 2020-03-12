@@ -1,0 +1,211 @@
+// A Star Algorithm.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include<deque>
+#include<iostream>
+#include<memory>
+#include<algorithm>
+using namespace std;
+
+struct coords
+{
+	int x;
+	int y;
+	int score;
+	coords* parent;
+};
+
+
+void nextcoords(coords* t, deque<unique_ptr<coords>>& myList)
+{
+	unique_ptr<coords>next(new coords);
+	cout <<"n: "<< t->x << " " << t->y << endl;
+	next->x = t->x;
+	next->y = t->y + 1;
+	next->score = t->score+1;
+	if (next->x >= 0 && next->x < 10 && next->y>=0 && next->y < 10)
+	{
+		myList.push_front(move(next));
+	}
+
+	next.reset(new coords);
+	next->x = t->x + 1;
+	next->y = t->y;
+	next->score = t->score+1;
+	if (next->x >= 0 && next->x < 10 && next->y>=0 && next->y < 10)
+	{
+		myList.push_front(move(next));
+	}
+
+	next.reset(new coords);
+	next->x = t->x;
+	next->y = t->y - 1;
+	next->score = t->score+1;
+	if (next->x >= 0 && next->x < 10 && next->y>=0 && next->y < 10)
+	{
+		myList.push_front(move(next));
+	}
+
+	next.reset(new coords);
+	next->x = t->x - 1;
+	next->y = t->y;
+	next->score = t->score+1;
+	if (next->x >= 0 && next->x < 10 && next->y>=0 && next->y < 10)
+	{
+		myList.push_front(move(next));
+	}
+}
+
+bool CompareCoords(unique_ptr<coords>& lhs, unique_ptr<coords>& rhs)
+{
+	return lhs->score < rhs->score;
+}
+
+
+void Display(deque<unique_ptr<coords>>& myList)
+{
+	if (myList.empty())
+	{
+		cout << "This List is empty" << endl;
+	}
+	else
+	{
+		deque <unique_ptr <coords> >::iterator p;  //creates an iterator to go through the list
+		cout << "Display list using created iterator and dereferencing using() around *p " << endl;
+		for (auto p = myList.begin(); p != myList.end(); p++)   //displays the open list using the iterator  
+		{
+			cout << (*p)->x << "  " << (*p)->y << endl;
+		}
+	}
+}
+
+
+bool find(coords* t, deque<unique_ptr<coords>>& openList)
+{
+
+	for (auto p = openList.begin(); p != openList.end(); p++)   //displays the open list using the iterator  
+	{
+		if (t->x == (*p)->x && t->y == (*p)->y)
+		{
+			cout << "The coords searched for are in the open list" << endl;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+}
+
+
+int main()
+{
+	cout << "Pathfinding Excercise 8 A* Search" << endl << endl;
+	//creating open list and closed list
+	deque <unique_ptr < coords > > openList;
+	deque <unique_ptr < coords > > closedList;
+
+	//creating tmp and current nodes
+	unique_ptr <coords> n(new coords);
+	unique_ptr <coords> currentNode(new coords);
+	unique_ptr <coords> newcost(new coords);
+
+	//creating pointers for start and end nodes
+	unique_ptr <coords> startNode(new coords);
+	unique_ptr <coords> endNode(new coords);
+
+	//assign the start node to the front of the open list
+	startNode->x = 4;
+	startNode->y = 4;
+	startNode->score = 0;
+	openList.push_front(move(startNode));
+
+	//assign the end location
+	endNode->x = 6;
+	endNode->y = 6;
+
+	cout << "open list x: " << openList.front()->x << " open list y: " << openList.front()->y << endl;
+	cout << "end x: " << endNode->x << " end y: " << endNode->y << endl;
+
+
+
+	while (openList.front()->x != endNode->x || openList.front()->y != endNode->y)  //while front of the open list isn't the goal
+	{
+		currentNode = move(openList.front());      //pop first item from open list and make current 
+		openList.pop_front();
+		nextcoords(currentNode.get(), openList);
+		cout << "current X: "<<currentNode->x << " "<<"current Y: "<<currentNode->y <<"  score:  "<<currentNode->score<< endl;
+		
+		n = move(openList.front());  //make n the front of the open list
+		openList.pop_front();
+		cout << "n X: " << n->x << " " << "n Y: " << n->y << " n score:  " << n->score << endl;
+		
+		Display(openList);
+		Display(closedList);
+		newcost->score = currentNode->score + n->score;
+		cout << "newscore: " <<newcost->score<< endl;
+		
+		
+		
+			
+		if (find(n.get(), openList) == true || find(n.get(), closedList) == true)
+		{
+			cout << "item is on the open or closed list ";
+			if (newcost->score >= n->score)
+			{
+				//need to look at how to skip out of this
+				//back to the start
+				cout << "with new score greater than or equal to n score" << endl;
+			}
+			else
+			{
+				cout << "with new score less than previous" << endl;
+				// n from list = existing n
+				// parent *n = current
+				// calculate hueristic value
+				// n->score = newscore->score + heuristic
+			}
+		}
+		else 
+		{
+			cout << "item not on list" << endl;
+			if (find(n.get(), closedList) == true)
+			{
+				cout << "Popping n from closed and pushing to open" << endl;
+				//pop from closed
+				//push on open
+			}
+			else
+			{
+				cout << "Pushing to open list" << endl;
+				//push on open
+				openList.push_back(move(n));
+			}
+		}
+		cout << "not reached goal" << endl;
+		cout << currentNode->x << currentNode->y << endl;
+		closedList.push_back(move(currentNode));
+		//sort(openList.begin(), openList.end(), CompareCoords);
+		// sort by lowest score first
+
+
+
+		
+		
+ 		system("pause");
+	}
+
+	cout << "You have reached the goal" << endl;
+	
+	
+
+	Display(openList);
+	Display(closedList);
+	//cout << currentNode->x << "  " << currentNode->y << endl;
+
+	//currentNode = Transfer(move(currentNode));  //output from pointer/transfer
+
+	system("pause");
+}
+
