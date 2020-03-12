@@ -1,0 +1,483 @@
+#include<iostream>
+#include<string>
+using namespace std;
+
+class cnode
+{
+	string name;
+	string gender;
+	string character;	
+	double strength; 
+	double health;
+	double wealth;
+	cnode* cnext;
+public:
+	cnode()
+	{
+		cout<<"Please Enter Name"<<endl;
+		getline(cin, name);
+		cout<<"please Enter Gender"<<endl;
+		getline(cin, gender);
+		cout<<"Enter Character Class"<<endl;
+		getline(cin, character);
+		cout<<"Enter Character Strength"<<endl;
+		cin>>strength;
+		cout<<"Enter Character Health"<<endl;
+		cin>>health;
+		cout<<"Enter Character Wealth"<<endl;
+		cin>>wealth;
+		cnext=NULL;
+	}
+
+	~cnode()
+	{
+		cout<<"Deleting"<<endl;
+	}
+
+	void setpointercharacter(cnode* characterpoint)
+	{
+		cnext=characterpoint;
+	}
+
+	string getcharactername()
+	{
+		return name;
+	}
+
+	string getgender()
+	{
+		return gender;
+	}
+
+	string type()
+	{
+		return character;
+	}
+
+	double gethealth()
+	{
+		return health;
+	}
+
+	double getwealth()
+	{
+		return wealth;
+	}
+
+	double getstrength()
+	{
+		return strength;
+	}
+
+	cnode* getcharacterpointer()//Get Character Pointer
+	{
+		return cnext;
+	}
+};
+
+class wnode //Weapon Class
+{
+	string weapon;
+	string uniqueweaponname;
+	double magic;
+	double mana;
+	wnode* wnext;
+public:
+	wnode()
+	{
+		cout<<"Enter Weapon"<<endl;
+		getline(cin, weapon);
+		cout<<"Enter Unique Weapon Name"<<endl;
+		getline(cin, uniqueweaponname);
+		cout<<"Enter Weapon Magic Resistance"<<endl;
+		cin>>magic;
+		cout<<"Weapon Mana Cost:"<<endl;
+		cin>>mana;
+		wnext=NULL;
+	}
+~wnode()
+	{
+		cout<<"Deleting Weapon"<<endl;
+	}
+void setpointerweapon(wnode* weaponpoint)
+	{
+		wnext=weaponpoint;
+	}
+
+	string getweaponname()
+	{
+		return weapon;
+	}
+
+	string getuwname()
+	{
+		return uniqueweaponname;
+	}
+
+	double getmagic()
+	{
+		return magic;
+	}
+
+	double getmana()
+	{
+		return mana;
+	}
+
+	wnode* getweaponpointer()
+	{
+		return wnext;
+	}
+};
+
+class onode //Object Class
+{
+	string object;	
+	int magic, cost;
+	onode* onext;
+public:
+	onode()
+	{
+		cout<<"Enter Object"<<endl;
+		getline(cin, object);
+		cout<<"Enter Object Magic Damage"<<endl;
+		cin>>magic;
+		cout<<"Object Mana Cost:"<<endl;
+		cin>>cost;
+		onext=NULL;
+	}
+~onode()
+	{
+		cout<<"Deleting Object"<<endl;
+	}
+void setpointerobject(onode* objectpoint)
+	{
+		onext=objectpoint;
+	}
+
+	string getobjectname()
+	{
+		return object;
+	}
+
+	onode* getobjectpointer()
+	{
+		return onext;
+	}
+};
+class snode //Spell Class
+{
+	string spell;	
+	int magic, cost;
+	snode* snext;
+public:
+	snode()
+	{
+		cout<<"Enter Spell"<<endl;
+		getline(cin, spell);
+		cout<<"Enter Spell Magic Damage"<<endl;
+		cin>>magic;
+		cout<<"Spell Mana Cost:"<<endl;
+		cin>>cost;
+		snext=NULL;
+	}
+~snode()
+	{
+		cout<<"Deleting Spell"<<endl;
+	}
+void setpointerspell(snode* spellpoint)
+	{
+		snext=spellpoint;
+	}
+
+	string getspellname()
+	{
+		return spell;
+	}
+
+	snode* getspellpointer()
+	{
+		return snext;
+	}
+};
+
+void addcharacter(cnode* &start)
+{
+	cnode* temp;
+	cnode* current;
+	cnode* past;
+	temp = new cnode;
+
+	if (start==NULL || temp->getcharactername()<start->getcharactername())
+	{
+		temp->setpointercharacter(start);
+		start=temp;
+	}
+	else
+	{
+		current=start;
+		while(current!=NULL && temp->getcharactername()>current->getcharactername())
+		{
+			past=current;
+			current=current->getcharacterpointer();
+		}
+		past->setpointercharacter(temp);
+		temp->setpointercharacter(current);
+	}
+}
+
+void addweapon(wnode* wstart)
+{
+	wnode* temp;
+	wnode* current;
+	wnode* past;
+	temp = new wnode;
+	string playerchoice;
+
+	if (wstart==NULL || temp->getweaponname()<wstart->getweaponname())
+	{
+		temp->setpointerweapon(wstart);
+		wstart=temp;
+	}
+	else
+	{
+		past=NULL;
+		current=wstart;
+		while(current!=NULL && temp->getweaponname()>=current->getweaponname())
+		{
+			past=current;
+			current=current->getweaponpointer();
+		}
+		past->setpointerweapon(temp);
+		temp->setpointerweapon(current);
+	}
+		return;
+}
+
+void addobject(onode* ostart)
+{
+	onode* temp;
+	onode* current;
+	onode* past;
+	temp = new onode;
+	string playerchoice;
+
+	if (ostart==NULL || temp->getobjectname()<ostart->getobjectname())
+	{
+		temp->setpointerobject(ostart);
+		ostart=temp;
+	}
+	else
+	{
+		past=NULL;
+		current=ostart;
+		while(current!=NULL && temp->getobjectname()>=current->getobjectname())
+		{
+			past=current;
+			current=current->getobjectpointer();
+		}
+		past->setpointerobject(temp);
+		temp->setpointerobject(current);
+	}
+		return;
+}
+
+void addspell(snode* spstart)
+{
+	snode* temp;
+	snode* current;
+	snode* past;
+	temp = new snode;
+	string playerchoice;
+
+	if (spstart==NULL || temp->getspellname()<spstart->getspellname())
+	{
+		temp->setpointerspell(spstart);
+		spstart=temp;
+	}
+	else
+	{
+		past=NULL;
+		current=spstart;
+		while(current!=NULL && temp->getspellname()>=current->getspellname())
+		{
+			past=current;
+			current=current->getspellpointer();
+		}
+		past->setpointerspell(temp);
+		temp->setpointerspell(current);
+	}
+	
+		return;
+}
+
+void delcharacter(cnode* start)
+{
+	string csearch;
+	cnode* current;
+	cnode* past;
+
+	if (start==NULL)
+		cout<<"No Character"<<endl;
+	else
+	{
+		cout<<"Character to be killed is: "<<endl;
+			getline(cin, csearch);
+		if (start->getcharactername()==csearch)
+		{
+			current=start;
+			start=start->getcharacterpointer();
+			delete current;
+		}
+		else
+		{
+			past=NULL;
+			current=start;
+			while(current!=NULL && current->getcharactername()!=csearch)
+			{
+				past=current;
+				current=current->getcharacterpointer();
+			}
+			if (current==NULL)
+				cout<<"Character not found"<<endl;
+			else
+			{
+				past->setpointercharacter(current->getcharacterpointer());
+				delete current;
+			}
+		}
+	}
+}
+
+void characteredit()
+{
+
+}
+
+void delweapon(wnode* start)
+{
+	string wsearch;
+	wnode* current;
+	wnode* past;
+
+	if (start=NULL)
+		cout<<"No Weapon"<<endl;
+	else
+	{
+		cout<<"Weapon Destroyed:  "<<endl;
+			getline(cin, wsearch);
+		if (start->getweaponname()==wsearch)
+		{
+			current=start;
+			start=start->getweaponpointer();
+			delete current;
+		}
+		else
+		{
+			past=NULL;
+			current=start;
+			while(current!=NULL && current->getweaponname()!=wsearch)
+			{
+				past=current;
+				current=current->getweaponpointer();
+			}
+			if (current==NULL)
+				cout<<"Weapon not found"<<endl;
+			else
+			{
+				past->setpointerweapon(current->getweaponpointer());
+				delete current;
+			}
+		}
+	}
+}
+
+void weaponedit()
+{
+
+}
+
+void objectedit()
+{
+
+}
+
+void spelledit()
+{
+
+}
+
+void display(cnode* start, wnode* wstart)
+{
+	cnode* temp;
+	temp=start;
+	if (temp==NULL)
+		cout<<"List Empty"<<endl;
+	else
+	{
+		while(temp!=NULL)
+			{
+				cout<<temp->getcharactername()<<endl;
+				cout<<temp->getgender()<<endl;
+				cout<<temp->gettype()<<endl;
+				cout<<temp->getstrength()<<endl;
+				cout<<temp->gethealth()<<endl;
+				cout<<temp->getwealth()<<endl;
+				temp=temp->getcharacterpointer();
+				cout<<endl;
+				cout<<"Weapon:"<<endl;
+				cout<<temp->getweaponname()<<endl;
+			}
+	}
+}
+
+void main()
+{
+	char option;
+	cnode* start=NULL;
+	wnode* wstart=NULL;
+	onode* ostart=NULL;
+	snode* spstart=NULL;
+	
+	do
+	{
+		cout<<endl<<endl<<endl;
+		cout<<"Main Menu"<<endl<<endl;
+		cout<<"1. Add Character"<<endl;
+		cout<<"2. Add Weapon"<<endl;
+		cout<<"3. Add Magical Object"<<endl;
+		cout<<"4. Add Spell"<<endl;
+		cout<<"5. Delete Character"<<endl;
+		cout<<"6. Delete Weapon"<<endl;
+		cout<<"7. Delete Object"<<endl;
+		cout<<"8. Delete Spell"<<endl;
+		cout<<"9. Display"<<endl;
+		cout<<endl<<endl;
+		cout<<"Q. Quit"<<endl;
+		cin>>option;
+		cin.ignore();
+		switch(option)
+		{
+		case '1':addcharacter(start);
+			break;
+		case '2':addweapon(wstart);
+			break;
+		case '3':addobject(ostart);
+			break;
+		case '4':addspell(spstart);
+			break;
+		case '9': display(start);
+			break;
+		case '6':delcharacter(start);
+			break;
+		case '7':
+			break;
+		case '8':
+			break;
+		case 'q':
+			break;
+		default: cout<<"You have entered a invaild option"<<endl;
+		}
+	}
+	while(option!='q');
+}

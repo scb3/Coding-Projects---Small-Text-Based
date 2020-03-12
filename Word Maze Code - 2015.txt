@@ -1,0 +1,126 @@
+#include<iostream>
+#include<iomanip>
+#include<fstream>
+#include<string>
+using namespace std;
+
+
+class node
+{
+	public:
+		int left;
+		char data;
+		int right;
+};
+
+node *start_ptr = NULL;
+node *current_ptr;
+
+
+void wordmaze(node maze[10][10])
+{
+	int row, col;//file>>array>>.left/right/data
+	ifstream wordmaze;
+		wordmaze.open("wordmaze.txt");
+	for(row=0;row<10;row++)
+		for(col=0;col<10;col++)
+	{
+		wordmaze>>maze[row][col].left;
+		wordmaze>>maze[row][col].data;
+		wordmaze>>maze[row][col].right;
+	}
+}
+
+void letterlist(char stack[20],int &tos)
+{
+	int row, col;
+	node maze[10][10];
+	wordmaze(maze);
+ if (tos==-1)
+	 cout<<"Stack overflow Error"<<endl;
+ else 
+	{	
+		tos--;
+		cin>>maze[row][col].data;
+		cin>>stack[tos];
+	}
+
+}
+
+
+void play()
+{
+	node maze[10][10];
+	wordmaze(maze);
+	int row, col, moves;
+	char playerchoice, Left, Right;
+	char stack[20];
+
+
+	cout<<"Please choose a direction: Left or Right:"<<endl;
+		cin>>playerchoice;
+	if(playerchoice==Left&&moves<20)
+	{
+		cout<<maze[row][col].left;
+		moves++;
+		cout<<moves;
+		letterlist(char stack);
+		//move player to row/col on left
+	}
+	if(playerchoice==Right&&moves<20)
+	{
+		cout<<maze[row][col].right;
+		moves++;
+		cout<<moves;
+		//pass maze.data to stack
+		//move player to row,col on right
+	}
+}
+
+void wordmazeshow()
+{
+	ifstream wordmaze("wordmaze.txt");
+	int left;
+	string letter;
+	int right;
+
+	while(wordmaze>>left>>letter>>right)
+	{
+		cout<<left<<"   "<<letter<<"   "<<right<<endl;
+	}
+
+}
+
+void main()
+{
+	char option;
+	char stack[20];
+	int tos=-1;
+
+  do
+  {
+	 cout<<endl<<endl<<endl;
+	 cout<<"Menu"<<endl<<endl;
+	 cout<<"1.  Play Game"<<endl;
+	 cout<<"2.  Show Maze"<<endl;
+	 cout<<"Q.  Quit system"<<endl<<endl;
+	 cout<<"Please enter option choice :";
+	 cin>>option;
+	 cin.ignore();
+	 switch (option)
+	 {
+		case '1': play();
+				 break;
+		case '2': wordmazeshow();
+				 break;
+		case 'q':cout<<"Quitting system"<<endl;
+				 break;
+		default: cout<<"you have entered an incorrect option choice please try again"<<endl<<endl;
+	 }
+  }
+  while (option!='5');
+
+
+	system("pause");
+
+}
